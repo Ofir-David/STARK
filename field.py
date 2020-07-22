@@ -34,27 +34,31 @@ class FieldElement:
 
     _p = 11  # (3 * 2 ** 30+1)
 
+    @staticmethod
+    def generator():
+        return 2
+
     def __init__(this, n):
         this.n = n % FieldElement._p  # might be negative, so
         if (this.n < 0):
             this.n += FieldElement._p
 
     def __add__(this, element):
-        return FieldElement(this.n+element.n)
+        return FieldElement(this.n + element.n)
 
     def __sub__(this, element):
-        return FieldElement(this.n-element.n)
+        return FieldElement(this.n - element.n)
 
     def __mul__(this, element):
-        return FieldElement(this.n*element.n)
+        return FieldElement(this.n * element.n)
 
     def __truediv__(this, element):
         if (element.n == 0):
             return FieldElement(0)
-        return FieldElement(this.n/element.n)
+        return FieldElement(this.n / element.n)
 
     def __pow__(this, power):
-        pass
+        return FieldElement(pow(this.n, power, this._p))
 
     def __str__(this):
         return str(this.n)
@@ -66,8 +70,10 @@ class FieldElement:
         return FieldElement(m)
 
 
-e = FieldElement(4) * FieldElement(8)
+e = FieldElement(4) * FieldElement(2)
 print(e)
 # print(e**3)
 checkGcd(66, 1017)
 print(e.inv())
+print(e**3)
+print(e.generator())

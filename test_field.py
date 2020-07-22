@@ -1,5 +1,5 @@
 import pytest
-from field import FieldElement
+import field
 
 
 def test_eq(n):

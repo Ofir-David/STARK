@@ -30,6 +30,24 @@ def checkGcd(n, m):
     print(f'the gcd of {n} and {m} is {res[0]}={n}*{res[1]}+{m}*{res[2]}')
 
 
+def Convert(f):
+    def wrapper(self, element):
+        if (isinstance(element, int)):
+            return f(self, element)
+        if (isinstance(element, FieldElement)):
+            return f(self, element.n)
+        return NotImplemented
+    return wrapper
+
+
+def getValue(element):
+    if (isinstance(element, FieldElement)):
+        return element.n
+    if (isinstance(element, int)):
+        return element
+    return 1
+
+
 class FieldElement:
 
     _p = 11  # (3 * 2 ** 30+1)
@@ -39,23 +57,52 @@ class FieldElement:
         return 2
 
     def __init__(this, n):
-        this.n = n % FieldElement._p  # might be negative, so
-        if (this.n < 0):
-            this.n += FieldElement._p
+        this.n = getValue(n) % FieldElement._p  # might be negative, so
+        # For some reason, in java you could get negative numbers...
+        # if (this.n < 0):
+        #    this.n += FieldElement._p
 
+    # The @element parameter in the following can be either FieldElement or integer
+    # Any other type will return NotImplemented, so it can try to use the same operator on
+    # the element parameter (e.g. element.__add__(self) )
+    @Convert
+    def __eq__(this, element):
+        return this.n == element
+
+    def __req__(this, element):
+        return this.n == element
+
+    @Convert
     def __add__(this, element):
-        return FieldElement(this.n + element.n)
+        return FieldElement(this.n + element)
 
+    @Convert
+    def __radd__(this, element):
+        return FieldElement(this.n + element)
+
+    @Convert
     def __sub__(this, element):
-        return FieldElement(this.n - element.n)
+        return FieldElement(this.n - element)
 
+    @Convert
+    def __rsub__(this, element):
+        return FieldElement(element - this.n)
+
+    @Convert
     def __mul__(this, element):
-        return FieldElement(this.n * element.n)
+        return FieldElement(this.n * element)
 
+    @Convert
+    def __rmul__(this, element):
+        return FieldElement(this.n * element)
+
+    @Convert
     def __truediv__(this, element):
-        if (element.n == 0):
-            return FieldElement(0)
-        return FieldElement(this.n / element.n)
+        return FieldElement(this.n * FieldElement(element).inv().n)
+
+    @Convert
+    def __rtruediv__(this, element):
+        return element * this.inv()
 
     def __pow__(this, power):
         return FieldElement(pow(this.n, power, this._p))
@@ -70,10 +117,27 @@ class FieldElement:
         return FieldElement(m)
 
 
-e = FieldElement(4) * FieldElement(2)
-print(e)
+# e = FieldElement(4) * FieldElement(2)
+# print(e)
 # print(e**3)
-checkGcd(66, 1017)
-print(e.inv())
-print(e**3)
-print(e.generator())
+# checkGcd(66, 1017)
+# print(e.inv())
+# print(e**3)
+# print(e.generator())
+'''a = FieldElement(4)
+b = FieldElement(3)
+print(a + b)
+print(a + 3)
+print(4 + b)
+
+print(a - b)
+print(a - 3)
+print(4 - b)
+
+print(a * b)
+print(a * 3)
+print(4 * b)
+
+print(a / b)
+print(2 / b)
+print(a / 2)'''

@@ -67,6 +67,7 @@ class FieldElement:
     # the element parameter (e.g. element.__add__(self) )
     @Convert
     def __eq__(this, element):
+        print("check equals")
         return this.n == element
 
     def __req__(this, element):
@@ -124,9 +125,13 @@ class FieldElement:
 # print(e.inv())
 # print(e**3)
 # print(e.generator())
-'''a = FieldElement(4)
-b = FieldElement(3)
-print(a + b)
+
+#a = FieldElement(2)
+#b = FieldElement(2)
+
+#print(a != b)
+
+'''print(a + b)
 print(a + 3)
 print(4 + b)
 

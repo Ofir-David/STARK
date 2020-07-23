@@ -70,7 +70,9 @@ class FieldElement:
         return this.n == element % FieldElement._p
 
     def __req__(this, element):
-        return this.n == element
+        return this == element
+
+    # ----------------------- arithmetics -------------------------
 
     @Convert
     def __add__(this, element):
@@ -78,7 +80,6 @@ class FieldElement:
 
     @Convert
     def __radd__(this, element):
-        d = 1 + 2
         return FieldElement(this.n + element)
 
     @Convert
@@ -107,6 +108,8 @@ class FieldElement:
 
     def __pow__(this, power):
         return FieldElement(pow(this.n, power, this._p))
+
+    # ------------------------------------------------------------------
 
     def __str__(this):
         return str(this.n)

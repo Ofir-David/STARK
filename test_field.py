@@ -7,7 +7,7 @@ import operator
 # python -m pytest test_field.py
 
 def randN():
-    return random.randint(-FieldElement._p*2, FieldElement._p*2)
+    return random.randint(-FieldElement._p * 2, FieldElement._p * 2)
 
 
 def test_eq():
@@ -41,13 +41,3 @@ def test_operations():
         bin_test(operator.mul, n, m, n * m)
         if ((m % FieldElement._p) != 0):
             bin_test(operator.truediv, n * m, m, n)
-
-
-'''
-def test_add(n,m):
-    k = (n+m)%FieldElement._p
-    if (k<0):
-        k+=FieldElement._p
-    ne = FieldElement(n)
-    me = FieldElement(m)
-    assert 1=1'''

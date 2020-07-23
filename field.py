@@ -67,8 +67,7 @@ class FieldElement:
     # the element parameter (e.g. element.__add__(self) )
     @Convert
     def __eq__(this, element):
-        print("check equals")
-        return this.n == element
+        return this.n == element % FieldElement._p
 
     def __req__(this, element):
         return this.n == element
@@ -79,6 +78,7 @@ class FieldElement:
 
     @Convert
     def __radd__(this, element):
+        d = 1 + 2
         return FieldElement(this.n + element)
 
     @Convert
@@ -99,7 +99,7 @@ class FieldElement:
 
     @Convert
     def __truediv__(this, element):
-        return FieldElement(this.n * FieldElement(element).inv().n)
+        return this * FieldElement(element).inv()
 
     @Convert
     def __rtruediv__(this, element):
@@ -111,38 +111,11 @@ class FieldElement:
     def __str__(this):
         return str(this.n)
 
+    def __repr__(this):
+        return str(this)
+
     def inv(this):
         if (this.n == 0):
             return 0  # raise sum error
         _, m, _ = gcd(this.n, this._p)
         return FieldElement(m)
-
-
-# e = FieldElement(4) * FieldElement(2)
-# print(e)
-# print(e**3)
-# checkGcd(66, 1017)
-# print(e.inv())
-# print(e**3)
-# print(e.generator())
-#
-# a = FieldElement(2)
-# b = FieldElement(2)
-#
-# print(a != b)
-
-'''print(a + b)
-print(a + 3)
-print(4 + b)
-
-print(a - b)
-print(a - 3)
-print(4 - b)
-
-print(a * b)
-print(a * 3)
-print(4 * b)
-
-print(a / b)
-print(2 / b)
-print(a / 2)'''

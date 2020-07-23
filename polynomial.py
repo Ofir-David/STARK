@@ -91,7 +91,7 @@ def single_interpolate(x_values, special):
 
 
 def interpolate_poly(x_values, y_values):
-    return sum([single_interpolate(x_values, val)*y for val, y in zip(x_values, y_values)])
+    return sum([single_interpolate(x_values, val) * y for val, y in zip(x_values, y_values)])
 
 
 p = Poly()

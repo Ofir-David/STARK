@@ -22,7 +22,7 @@ def innerGcd(n, m):  # n>m>0
         return (m, 0, 1)
     else:
         res = innerGcd(m, r)
-        return (res[0], res[2], res[1]-q*res[2])
+        return (res[0], res[2], res[1] - q * res[2])
 
 
 def checkGcd(n, m):
@@ -125,11 +125,11 @@ class FieldElement:
 # print(e.inv())
 # print(e**3)
 # print(e.generator())
-
-#a = FieldElement(2)
-#b = FieldElement(2)
-
-#print(a != b)
+#
+# a = FieldElement(2)
+# b = FieldElement(2)
+#
+# print(a != b)
 
 '''print(a + b)
 print(a + 3)

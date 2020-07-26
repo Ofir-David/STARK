@@ -1,3 +1,0 @@
-# import fileType
-
-print("packing ")

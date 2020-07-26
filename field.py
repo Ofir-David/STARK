@@ -2,8 +2,10 @@ print("loaded file field.py")
 
 
 def innerGcd(n, m):  # n>m>0
-    # returns an integer triple (d,a,b) such that d=a*n+b*m, under the assumption that
-    # n>m>0
+    """
+    returns a triple (d,a,b) such that d=a*n+b*m under the assumption that n>m>0.
+    In particular d=gcd(n,m)
+    """
     q = n // m
     r = n - q * m
     if (r == 0):
@@ -14,7 +16,10 @@ def innerGcd(n, m):  # n>m>0
 
 
 def gcd(n, m):
-    # returns an integer triple (d,a,b) such that d=a*n+b*m
+    """
+    returns a triple (d,a,b) such that d=a*n+b*m. In particular d=gcd(n,m).
+    If both n=m=0, then returns (0,1,0), so that 0=gcd(0,0)
+    """
     if (m == 0):
         return (n, 1, 0)
     if (n == 0):
@@ -24,27 +29,12 @@ def gcd(n, m):
     n *= signN
     m *= signM
     if (n < m):
+
         res = innerGcd(m, n)
         return (res[0], res[2] * signN, res[1] * signM)
     else:
         res = innerGcd(n, m)
         return (res[0], res[1] * signN, res[2] * signM)
-
-
-def checkGcd(n, m):
-    res = gcd(n, m)
-    print(f'the gcd of {n} and {m} is {res[0]}={n}*{res[1]}+{m}*{res[2]}')
-
-
-def Convert(f):
-    def wrapper(self, element):
-        if (isinstance(element, int)):
-            return f(self, element)
-        if (isinstance(element, FieldElement)):
-            return f(self, element.n)
-        return NotImplemented
-
-    return wrapper
 
 
 def getValue(element):
@@ -54,7 +44,17 @@ def getValue(element):
         return element.n
     if (isinstance(element, int)):
         return element
-    return 1
+    return NotImplemented
+
+
+def Convert(f):
+    def wrapper(self, element):
+        value = getValue(element)
+        if (value == NotImplemented):
+            return NotImplemented
+        return f(self, value)
+
+    return wrapper
 
 
 class FieldElement:
@@ -66,6 +66,7 @@ class FieldElement:
         return 2
 
     def __init__(this, n):
+        # should change the n variable into property so it will always be mod _p
         this.n = getValue(n) % FieldElement._p  # might be negative, so
         # For some reason, in java you could get negative numbers...
         # if (this.n < 0):
@@ -128,6 +129,6 @@ class FieldElement:
 
     def inv(this):
         if (this.n == 0):
-            return 0  # raise sum error
+            raise ZeroDivisionError
         _, m, _ = gcd(this.n, this._p)
         return FieldElement(m)

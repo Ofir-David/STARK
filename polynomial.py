@@ -1,6 +1,9 @@
-from field import FieldElement
+from .field import FieldElement
+from . import field
 import itertools
 import math
+
+print("loaded polynomial.py")
 
 
 def ConvPoly(f):
@@ -80,18 +83,6 @@ class Poly:
     def __str__(self):
         if (self.isZero()):
             return "0"
-        '''monoms = []
-        if (self.coef[0]!=0):
-            monoms.append(str(self.coef[0]))
-        if (self.getCoef(1)!=0
-        for i, c in enumerate(self.coef):
-            if (c==0):
-                continue
-            if (c==1):
-                coefStr = ""
-            else:
-                coefStr = str(c)
-            if (i=0'''
         return " + ".join([f'{str(c)}*X^{i}' for i, c in enumerate(self.coef) if not c == 0])
 
     def isZero(self):

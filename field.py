@@ -1,4 +1,20 @@
+print("loaded file field.py")
+
+
+def innerGcd(n, m):  # n>m>0
+    # returns an integer triple (d,a,b) such that d=a*n+b*m, under the assumption that
+    # n>m>0
+    q = n // m
+    r = n - q * m
+    if (r == 0):
+        return (m, 0, 1)
+    else:
+        res = innerGcd(m, r)
+        return (res[0], res[2], res[1] - q * res[2])
+
+
 def gcd(n, m):
+    # returns an integer triple (d,a,b) such that d=a*n+b*m
     if (m == 0):
         return (n, 1, 0)
     if (n == 0):
@@ -9,20 +25,10 @@ def gcd(n, m):
     m *= signM
     if (n < m):
         res = innerGcd(m, n)
-        return (res[0], res[2] * signM, res[1] * signN)
+        return (res[0], res[2] * signN, res[1] * signM)
     else:
         res = innerGcd(n, m)
         return (res[0], res[1] * signN, res[2] * signM)
-
-
-def innerGcd(n, m):  # n>m>0
-    q = n // m
-    r = n - q * m
-    if (r == 0):
-        return (m, 0, 1)
-    else:
-        res = innerGcd(m, r)
-        return (res[0], res[2], res[1] - q * res[2])
 
 
 def checkGcd(n, m):
@@ -37,10 +43,13 @@ def Convert(f):
         if (isinstance(element, FieldElement)):
             return f(self, element.n)
         return NotImplemented
+
     return wrapper
 
 
 def getValue(element):
+    # returns the integer value of a field element in the range [0,_p), or the element itself
+    # if it is an integer. Otherwise returns 1 (should change to NotImplemented?)
     if (isinstance(element, FieldElement)):
         return element.n
     if (isinstance(element, int)):

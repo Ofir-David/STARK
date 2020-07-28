@@ -1,5 +1,5 @@
 # import pack.fileType
-import .field
+from tests.test_fourier import *
 
 # pack.fileType.mop()
 print("trying this")

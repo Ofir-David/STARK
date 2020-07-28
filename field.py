@@ -60,11 +60,11 @@ def Convert(f):
 
 class FieldElement:
 
-    _p = 11  # (3 * 2 ** 30+1)
+    _p = 17  # (3 * 2 ** 30+1)
 
     @staticmethod
     def generator():
-        return 2
+        return FieldElement(3)
 
     def __init__(this, n):
         # should change the n variable into property so it will always be mod _p
@@ -130,6 +130,9 @@ class FieldElement:
             power = -power
         return batch_pow(base, [power])[0]
         # return FieldElement(pow(this.n, power, this._p))
+
+    def __abs__(this):
+        return this
 
     # ------------------------------------------------------------------
 

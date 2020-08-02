@@ -1,0 +1,4 @@
+[
+  "tests/test_merkle.py::test_hash",
+  "tests/test_merkle.py::test_path"
+]

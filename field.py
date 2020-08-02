@@ -66,6 +66,9 @@ class FieldElement:
     def generator():
         return FieldElement(3)
 
+    def generatorInv():
+        return FieldElement(6)
+
     def __init__(this, n):
         # should change the n variable into property so it will always be mod _p
         this.n = getValue(n) % FieldElement._p  # might be negative, so

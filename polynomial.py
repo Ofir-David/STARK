@@ -1,7 +1,10 @@
-from .field import FieldElement
-from . import field
+
 import itertools
 import math
+
+from .fourier import FFT, FFT_inv
+from .field import FieldElement
+from . import field
 
 print("loaded polynomial.py")
 
@@ -146,3 +149,9 @@ def single_interpolate(x_values, special):
 
 def interpolate_poly(x_values, y_values):
     return sum([single_interpolate(x_values, x) * y for x, y in zip(x_values, y_values)])
+
+
+# xi should be an element of order len(y_values)
+# otherwise... well, let's just not go there
+def interpolate_poly_FFT(xi, y_values):
+    return Poly(FFT_inv(y_values, xi))

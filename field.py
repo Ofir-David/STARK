@@ -66,6 +66,7 @@ class FieldElement:
     def generator():
         return FieldElement(3)
 
+    @staticmethod
     def generatorInv():
         return FieldElement(6)
 

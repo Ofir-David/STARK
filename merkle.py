@@ -66,10 +66,10 @@ class MerkleTree:
         if (leafIndex < self.numLeaves // 2):
             child = self.left.reveal_path(leafIndex)
             yield from child
-            print(self.root+"("+self.right.root+")")
+            # print(self.root + "("+self.right.root+")")
             yield self.right.root
         else:
             child = self.right.reveal_path(leafIndex - self.numLeaves // 2)
             yield from child
-            print(self.root+"("+self.left.root+")")
+            # print(self.root+"("+self.left.root+")")
             yield self.left.root

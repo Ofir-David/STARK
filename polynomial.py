@@ -19,6 +19,21 @@ def ConvPoly(f):
     return wrapper
 
 
+def ConvRational(f):
+    def wrapper(self, other):
+        if (isinstance(other, int) or isinstance(other, FieldElement)):
+            other = RationalFunc(Poly([other]), 1)
+        if (isinstance(other, Poly)):
+            other = RationalFunc(other, 1)
+        if (isinstance(other, RationalFunc)):
+            return f(self, other)
+        return NotImplemented
+    return wrapper
+
+# Question: should I make the coefficients fixed or not? Important for implementation of
+#          degree and leading coefficient.
+
+
 class Poly:
 
     def __init__(self, coef=[0]):
@@ -33,6 +48,16 @@ class Poly:
         return sum
 
     # --------------------- arithmetics -----------------------
+
+    @ConvPoly
+    def __eq__(this, other):
+        for a, b in itertools.zip_longest(self.coef, other.coef, fillValue='a'):
+            if (a != b):
+                return False
+        return true
+
+    def __req__(this, element):
+        return this == element
 
     @ConvPoly
     def __add__(self, other):
@@ -70,18 +95,28 @@ class Poly:
             other = FieldElement(other)
         if (isinstance(other, FieldElement)):
             return self * other.inv()
+        if (isinstance(other, Poly)):
+            return RationalFunc._
         return NotImplemented
 
     def __pow__(this, power):
         return pow(this, power)
 
+    # return the degree of the polynomial with deg(0)=-1
+    # after running the method, len(self.coef)=deg+1
     def deg(self):
+        while (self.coef[-1] == 0):
+            self.coef.pop()
         return len(self.coef) - 1  # this is not really the degree! just the length of the list
 
     def getCoef(self, index):
         if (index < 0 or index >= len(self.coef)):
             return 0
         return self.coef[index]
+
+    def leadingCoef(self):
+        self.deg()
+        return self.coef[-1]
 
     def __str__(self):
         if (self.isZero()):
@@ -92,6 +127,7 @@ class Poly:
         for c in self.coef:
             if (c != 0):
                 return False
+        self.coef = []
         return True
 
 
@@ -100,6 +136,13 @@ class RationalFunc:
     def __init__(self, num=0, denum=1):
         self.num = num
         self.denum = denum
+
+    @ConvRational
+    def __eq__(self, other: RationalFunc):
+        return self.num * other.denum == self.denum * other.num
+
+    def __req__(self, other):
+        return self == other
 
     def __mul__(self, other):
         if (isinstance(other, RationalFunc)):
@@ -130,8 +173,46 @@ class RationalFunc:
     def __rsub__(self, other):  # other will not be RationalFunc
         pass
 
+    def __truediv__(self, other):
+        if (other == 0):
+            raise ZeroDivisionError
+        if (isinstance(other, int) or isinstance(other, FieldElement)):
+            return RationalFunc(self.num / other, self.denum)
+        if (isinstance(other, Poly)):
+            return RationalFunc(self.num, self.denum * other)
+        if (isinstance(other, RationalFunc)):
+            return RationFunc(self.num * other.denum, self.denum * other.num)
+        return NotImplemented
+
+    def __rtruediv__(self, other):
+        if (self == 0):
+            raise ZeroDivisionError
+        return other * RationalFunc(self.denum, self.num)
+
     def __str__(self):
         return str(self.num) + " / " + str(self.denum)
+
+    def is_zero(self):
+        return self.num == 0
+
+    def div_with_remainder(self):
+        num = self.num
+        denum = self.denum  # should not be zero!
+        q = Poly(0)
+        dNum = num.deg()
+        dDenum = denum.deg()
+        while (dNum >= dDenum):
+            temp = (num.leadingCoef() / denum.leadingCoef()) * X**(dNum - dDenum)
+            q += temp
+            num -= denum * temp
+            dNum = num.deg()
+        return q, num
+
+    def to_polynomial(self):
+        q, r = self.div_with_remainder()
+        if (r == 0):
+            return q
+        return self
 
 
 X = Poly([0, 1])

@@ -4,8 +4,8 @@
 # will make the func\class\file obj to be accessible as STARK.obj
 
 from .field import FieldElement
+#print("loaded STARK.__init__")
 
-print("loaded package STARK")
 
 # to run the tests, enter
 # (for a single test) pytest STARK/tests/test_field.py::test_eq()

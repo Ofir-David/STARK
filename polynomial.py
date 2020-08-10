@@ -36,8 +36,13 @@ def ConvRational(f):
 
 class Poly:
 
-    def __init__(self, coef=[0]):
+    def __init__(self, coef=[]):
         self.coef = [c for c in coef]
+        self._remove_zeros()
+
+    def _remove_zeros(self):
+        while (len(self.coef) > 0 and self.coef[-1] == 0):
+            self.coef.pop()
 
     def __call__(self, elem):
         sum = FieldElement(0)
@@ -96,17 +101,16 @@ class Poly:
         if (isinstance(other, FieldElement)):
             return self * other.inv()
         if (isinstance(other, Poly)):
-            return RationalFunc._
+            return RationalFunc(self, other)
         return NotImplemented
 
     def __pow__(this, power):
-        return pow(this, power)
+        return field.batch_pow(this, [power])[0]
 
     # return the degree of the polynomial with deg(0)=-1
     # after running the method, len(self.coef)=deg+1
     def deg(self):
-        while (self.coef[-1] == 0):
-            self.coef.pop()
+        self._remove_zeros()
         return len(self.coef) - 1  # this is not really the degree! just the length of the list
 
     def getCoef(self, index):
@@ -130,6 +134,20 @@ class Poly:
         self.coef = []
         return True
 
+    # xi should be of order n>deg
+
+    def fast_eval(self, xi, n, c):
+        if (n <= self.deg()):
+            raise Error()  # define error
+        temp = 1
+        L = []
+        for alpha in self.coef:
+            L.append(alpha * temp)
+            temp *= c
+        for _ in range(self.deg()-n):
+            L.append(0)
+        return FFT(L, xi)
+
 
 class RationalFunc:
 
@@ -138,7 +156,7 @@ class RationalFunc:
         self.denum = denum
 
     @ConvRational
-    def __eq__(self, other: RationalFunc):
+    def __eq__(self, other):
         return self.num * other.denum == self.denum * other.num
 
     def __req__(self, other):

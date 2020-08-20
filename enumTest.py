@@ -1,6 +1,7 @@
 import sys
 from types import MappingProxyType, DynamicClassAttribute
 
+# There are missing tests
 
 __all__ = [
     'EnumMeta',

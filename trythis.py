@@ -60,6 +60,7 @@ print(md)
 
 # I added a new feature
 # another feature
+# I actually want another comment
 
 '''from .enumTest import Enum, auto
 

@@ -2,6 +2,7 @@ import cmath
 import random
 from .field import FieldElement
 
+
 # L should be an array of length 2^n
 
 

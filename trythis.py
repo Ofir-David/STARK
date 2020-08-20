@@ -1,4 +1,64 @@
-from .enumTest import Enum, auto
+import pytest
+import inspect
+
+from marshmallow_dataclass import dataclass as m_dataclass
+import marshmallow_dataclass
+import dataclasses
+
+'''
+def bar():
+    print("hello")
+
+
+print(type(bar))
+
+
+def foo(f):
+    def wrapper(*arg):
+        print('hi')
+        f(*arg)
+        print('bye')
+    return wrapper
+
+
+@foo
+@pytest.mark.parametrized('a', [1, 2, 3])
+def test_me(a):
+    assert a > 0
+'''
+
+'''
+@pytest.mark.parametrized('a', [1, 2, 3])
+def test(a):
+    assert a == 0
+
+
+print(test.__code__.co_varnames)
+'''
+
+
+@m_dataclass
+class Data:
+    suit: str
+    rank: str
+
+
+d = Data("hearts", "4")
+md = dataclasses.replace(d, **{"suit": "club"})
+cls = d.__class__
+dtemp = cls(**d.__dict__)
+dtemp.rank = "10"
+dd = d
+ddd = Data(**d.__dict__)
+print(d)
+dd.suit = "diamond"
+print(d)
+print(dd)
+print(ddd)
+print(dtemp)
+print(md)
+
+'''from .enumTest import Enum, auto
 
 
 def printAll(enumCls):
@@ -66,4 +126,4 @@ class option3(Enum00):
     fish = auto()
 
 
-printAll(option3)
+printAll(option3)'''

@@ -5,126 +5,40 @@ from marshmallow_dataclass import dataclass as m_dataclass
 import marshmallow_dataclass
 import dataclasses
 
-'''
-def bar():
-    print("hello")
+
+import asyncio
+import time
 
 
-print(type(bar))
+async def inner(x):
+    print(f'inner {x}')
+    time.sleep(0.5)
+    await asyncio.sleep(0.5)
 
 
-def foo(f):
-    def wrapper(*arg):
-        print('hi')
-        f(*arg)
-        print('bye')
-    return wrapper
+async def count(d):
+    print(f'One {d}')
+    await inner(d)
+    print(f'Two {d}')
+    await inner(-d)
+    print(f'Three {d}')
 
 
-@foo
-@pytest.mark.parametrized('a', [1, 2, 3])
-def test_me(a):
-    assert a > 0
-'''
+async def main():
+    asyncio.create_task(count(1))
 
-'''
-@pytest.mark.parametrized('a', [1, 2, 3])
-def test(a):
-    assert a == 0
+asyncio.run(main())
 
 
-print(test.__code__.co_varnames)
-'''
+@marshmallow_dataclass.dataclass
+class Batch():
+
+    prev_batch: int
+
+    def __post_init__(self):
+        print("this is post init")
+        raise Exception()
 
 
-@m_dataclass
-class Data:
-    suit: str
-    rank: str
-
-
-d = Data("hearts", "4")
-md = dataclasses.replace(d, **{"suit": "club"})
-cls = d.__class__
-dtemp = cls(**d.__dict__)
-dtemp.rank = "10"
-dd = d
-ddd = Data(**d.__dict__)
-print(d)
-dd.suit = "diamond"
-print(d)
-print(dd)
-print(ddd)
-print(dtemp)
-print(md)
-
-
-'''from .enumTest import Enum, auto
-
-
-def printAll(enumCls):
-    print(enumCls.__name__)
-    for data in enumCls:
-        print(f'    - {data.name}: {data.value}')
-    print('--------------------------\n')
-
-
-class option1(Enum):
-    cat = 0
-    dog = auto()
-    mouse = auto()
-    rabbit = 5
-    horse = auto()
-    sheep = auto()
-    cow = auto()
-    pig = 7
-    fish = auto()
-
-
-printAll(option1)
-
-
-class Enum0(Enum):
-    def _generate_next_value_(name, start, count, last_values):
-        return count
-
-
-class option2(Enum0):
-    cat = auto()
-    dog = auto()
-    mouse = auto()
-    rabbit = 5
-    horse = auto()
-    sheep = auto()
-    cow = auto()
-    pig = 7
-    fish = auto()
-
-
-printAll(option2)
-
-
-class Enum00(Enum):
-    def _generate_next_value_(name, start, count, last_values):
-        for last_value in reversed(last_values):
-            try:
-                return last_value + 1
-            except TypeError:
-                pass
-        else:
-            return 0
-
-
-class option3(Enum00):
-    cat = auto()
-    dog = auto()
-    mouse = auto()
-    rabbit = 5
-    horse = auto()
-    sheep = auto()
-    cow = auto()
-    pig = 7
-    fish = auto()
-
-
-printAll(option3)'''
+#batch = Batch(0)
+# print(batch)

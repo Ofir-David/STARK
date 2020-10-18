@@ -1,28 +1,29 @@
 import hashlib
 import math
 import colorama
-from .field import FieldElement
+from .field import FieldElement, ExtElement
+
+from typing import List
 
 sha = hashlib.sha256()
 
 
-def hash(s):
+def hash(s) -> str:
     return hashlib.sha256(s.encode()).hexdigest()
 
 
 class MerkleTree:
 
     @staticmethod
-    def hashElem(elem):
-        if (isinstance(elem, int)):
-            return hash(str(FieldElement(elem)))
-        if (isinstance(elem, FieldElement)):
-            return hash(str(elem))
+    def hashElem(elem: ExtElement) -> str:
+        if isinstance(elem, int):
+            return str(FieldElement(elem))
+        if isinstance(elem, FieldElement):
+            return str(elem)
 
-    @staticmethod
-    def check_path(leafIndex: int, hashGen, rootHash):
-        elem = next(hashGen)
-        lastHash = MerkleTree.hashElem(elem)
+    @ staticmethod
+    def check_path(leafIndex: int, hashGen, rootHash: str):
+        lastHash = next(hashGen)
         for nodeHash in hashGen:
             if (leafIndex % 2 == 0):  # left child
                 lastHash = hash(lastHash + nodeHash)
@@ -41,27 +42,24 @@ class MerkleTree:
             self.left.printAll(tabs + 1)
             self.right.printAll(tabs + 1)
 
-    def __init__(self, elem):
-        if (isinstance(elem, int) or isinstance(elem, FieldElement)):
+    def __init__(self, elem: List):
+        if not isinstance(elem, list):
             elem = [elem]
-        if (isinstance(elem, list)):
-            n = len(elem)
-            self.numLeaves = 2**math.ceil(math.log2(n))
-            elem = elem + [0] * (self.numLeaves - n)
-            n = self.numLeaves
-            if (n > 1):
-                self.left = MerkleTree(elem[:n // 2])
-                self.right = MerkleTree(elem[n // 2:])
-                self.root = hash(self.left.root + self.right.root)
-            else:
-                self.data = elem[0]
-                self.root = MerkleTree.hashElem(self.data)  # fix?
-            return
-        return None  # some error
+        n = len(elem)
+        self.numLeaves = 2**math.ceil(math.log2(n))
+        elem = elem + [0] * (self.numLeaves - n)
+        n = self.numLeaves
+        if (n > 1):
+            self.left = MerkleTree(elem[:n // 2])
+            self.right = MerkleTree(elem[n // 2:])
+            self.root: str = hash(self.left.root + self.right.root)
+        else:
+            self.data = elem[0]
+            self.root = str(self.data)
 
-    def reveal_path(self, leafIndex):
+    def reveal_path(self, leafIndex: int):
         if (self.numLeaves == 1):
-            yield self.data
+            yield self.root
             return
         if (leafIndex < self.numLeaves // 2):
             child = self.left.reveal_path(leafIndex)

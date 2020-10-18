@@ -10,7 +10,9 @@ def FFT(L, xi):
     '''
     Perform the fourier transform.
     L should be a list of size 2^n over some field F, and xi should be a 2^n
-    root of unity in F
+    root of unity in F.
+    If L=[a_0,...,a_(2^n -1)] and f = sum a_i x^i, then the return value will be
+    (f[1],f[xi],...,f[xi^(2^n -1)])
     '''
     if (len(L) == 1):
         return L

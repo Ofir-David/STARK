@@ -1,44 +1,13 @@
 import math
+from .math_utils import gcd
+from typing import Union, List
 
 print("loaded file field.py")
 
-
-def _innerGcd(n, m):  # n>m>0
-    """
-    returns a triple (d,a,b) such that d=a*n+b*m under the assumption that n>m>0.
-    In particular d=gcd(n,m)
-    """
-    q = n // m
-    r = n - q * m
-    if (r == 0):
-        return (m, 0, 1)
-    else:
-        res = _innerGcd(m, r)
-        return (res[0], res[2], res[1] - q * res[2])
+ExtElement = Union['FieldElement', int]
 
 
-def gcd(n, m):
-    """
-    returns a triple (d,a,b) such that d=a*n+b*m. In particular d=gcd(n,m).
-    If both n=m=0, then returns (0,1,0), so that 0=gcd(0,0)
-    """
-    if (m == 0):
-        return (n, 1, 0)
-    if (n == 0):
-        return (m, 0, 1)
-    signN = 1 if n > 0 else -1
-    signM = 1 if m > 0 else -1
-    n *= signN
-    m *= signM
-    if (n < m):
-        res = _innerGcd(m, n)
-        return (res[0], res[2] * signN, res[1] * signM)
-    else:
-        res = _innerGcd(n, m)
-        return (res[0], res[1] * signN, res[2] * signM)
-
-
-def getValue(element):
+def getValue(element: ExtElement) -> int:
     # returns the integer value of a field element in the range [0,_p), or the element itself
     # if it is an integer. Otherwise returns 1 (should change to NotImplemented?)
     if (isinstance(element, FieldElement)):
@@ -48,8 +17,15 @@ def getValue(element):
     return NotImplemented
 
 
+def getElement(element: ExtElement):
+    if (isinstance(element, FieldElement)):
+        return element
+    if (isinstance(element, int)):
+        return FieldElement(element)
+
+
 def Convert(f):
-    def wrapper(self, element):
+    def wrapper(self, element: ExtElement):
         value = getValue(element)
         if (value == NotImplemented):
             return NotImplemented
@@ -60,7 +36,8 @@ def Convert(f):
 
 class FieldElement:
 
-    _p = 17  # (3 * 2 ** 30+1)
+    _p = 3 * (2**30) + 1  # 17
+    _inv_gen = None
 
     @staticmethod
     def generator():
@@ -68,9 +45,11 @@ class FieldElement:
 
     @staticmethod
     def generatorInv():
-        return FieldElement(6)
+        if FieldElement._inv_gen is None:
+            FieldElement._inv_gen = FieldElement.generator().inv().n
+        return FieldElement(FieldElement._inv_gen)
 
-    def __init__(this, n):
+    def __init__(this, n: int):
         # should change the n variable into property so it will always be mod _p
         this.n = getValue(n) % FieldElement._p  # might be negative, so
         # For some reason, in java you could get negative numbers...
@@ -121,7 +100,7 @@ class FieldElement:
     def __rtruediv__(this, element):
         return element * this.inv()
 
-    def __pow__(this, power):
+    def __pow__(this, power: int):
         if (this == 0):
             return this
         # if batch_pow doesn't do any multiplication, it will just return 1 as a number
@@ -138,6 +117,14 @@ class FieldElement:
     def __abs__(this):
         return this
 
+    # -------------------- extra arithmetics -----------------------
+
+    def inv(this):
+        if (this.n == 0):
+            raise ZeroDivisionError
+        _, m, _ = gcd(this.n, this._p)
+        return FieldElement(m)
+
     # ------------------------------------------------------------------
 
     def __str__(this):
@@ -146,18 +133,15 @@ class FieldElement:
     def __repr__(this):
         return str(this)
 
-    def inv(this):
-        if (this.n == 0):
-            raise ZeroDivisionError
-        _, m, _ = gcd(this.n, this._p)
-        return FieldElement(m)
 
-
-def batch_pow(x, L):
+def batch_pow(x, L: List[int]):
+    """
+    Compute simultanously several powers of the same number x.
+    """
     max_power = max(L)
     results = [1 for _ in L]
     if (max_power == 0):
-        return res
+        return results
     n_bits = int(math.log2(max_power)) + 1
     for i in range(n_bits):
         mask = 1 << i
@@ -168,13 +152,21 @@ def batch_pow(x, L):
     return results
 
 
-def batch_inv(L):
+def batch_inv(L: List[ExtElement]):
+    """
+    Returns a list of inverses of the given elements.
+    """
+    # If L=[a_1, ..., a_n], create the list [1,a_1,a_1*a_2,..., a_1*a_2*...*a_n]
     mults = [FieldElement(1)]
     for elem in L:
         mults.append(mults[-1] * elem)
+    # If P_i = a_1*...*a_i (with P_0=1), then given 1/P_n we can find (using multiplication):
+    #   (1) 1/(a_n) = P_(n-1)* 1/P_n, and
+    #   (2) 1/P_(n-1) = a_n* 1/P_n
+    # Now use induction.
     inverse = mults[-1].inv()
     res = [0 for _ in L]
-    for i in range(len(L)):
-        res[- 1 - i] = mults[-2 - i] * inverse
-        inverse *= L[-1 - i]
+    for i in reversed(range(len(L))):
+        res[i] = mults[i - 1] * inverse
+        inverse *= L[i]
     return res

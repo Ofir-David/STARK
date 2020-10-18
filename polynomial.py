@@ -1,12 +1,15 @@
 
 import itertools
 import math
+from typing import Union
 
 from .fourier import FFT, FFT_inv
 from .field import FieldElement
 from . import field
 
 print("loaded polynomial.py")
+
+ExPoly = Union['Poly', FieldElement, int]
 
 
 def ConvPoly(f):
@@ -35,6 +38,14 @@ def ConvRational(f):
 
 
 class Poly:
+
+    @staticmethod
+    def monomial(k: int, c: int = 1):
+        """
+        Creates the monomial c*X^k.
+        """
+        assert k >= 0, 'f must be non negative.'
+        return Poly([0] * (k - 1) + [c])
 
     def __init__(self, coef=[]):
         self.coef = [c for c in coef]
@@ -104,6 +115,13 @@ class Poly:
             return RationalFunc(self, other)
         return NotImplemented
 
+    def __floordiv__(self, other):
+        func = self / other
+        if isinstance(func, RationalFunc):
+            q, _ = func.div_with_remainder()
+            return q
+        return func
+
     def __pow__(this, power):
         return field.batch_pow(this, [power])[0]
 
@@ -135,16 +153,18 @@ class Poly:
         return True
 
     # xi should be of order n>deg
-
+    # Compute the polynomial on [c*xi_k, k in [0,n)]
     def fast_eval(self, xi, n, c):
-        if (n <= self.deg()):
-            raise Error()  # define error
+        deg = self.deg()
+        assert n > deg, f'{n} must be strictly larger than {deg}'
+        # compute f(c*X)
         temp = 1
         L = []
         for alpha in self.coef:
             L.append(alpha * temp)
             temp *= c
-        for _ in range(self.deg()-n):
+        # pad with zeros
+        for _ in range(n - deg):
             L.append(0)
         return FFT(L, xi)
 
@@ -216,7 +236,7 @@ class RationalFunc:
     def div_with_remainder(self):
         num = self.num
         denum = self.denum  # should not be zero!
-        q = Poly(0)
+        q = Poly([0])
         dNum = num.deg()
         dDenum = denum.deg()
         while (dNum >= dDenum):
@@ -232,13 +252,25 @@ class RationalFunc:
             return q
         return self
 
+    # xi should be of order n>deg
+    # evaluate the function at [c* xi^k for f in [0,n)].
+    def fast_eval(self, xi, n, c):
+        num_valuations = self.num.fast_eval(xi, n, c)
+        denum_valuations = self.denum.fast_eval(xi, n, c)
+        return [a / b for a, b in zip(num_valuations, denum_valuations)]
+
 
 X = Poly([0, 1])
 
 # special value can appear at most 1 time in x_values
 
+counter = 0
+
 
 def single_interpolate(x_values, special):
+    global counter
+    print(f'single interpolate {counter}')
+    counter += 1
     special = FieldElement(special)
     # can make it in one loop
     num = math.prod([val - X for val in x_values if val != special])
